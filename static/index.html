@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud-Native Industrial Control System - Technical Implementation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.0/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px 0;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 16px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        
+        .header h1 {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 3rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        
+        .project-info {
+            background: rgba(30, 41, 59, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #3b82f6;
+            margin: 20px 0;
+        }
+        
+        h2 {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .diagram-container {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .mermaid {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .description {
+            color: #94a3b8;
+            margin: 15px 0;
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+        
+        .tech-stack {
+            background: rgba(15, 23, 42, 0.8);
+            border-left: 4px solid #8b5cf6;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        
+        .tech-stack h3 {
+            color: #a78bfa;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .tech-stack ul {
+            margin: 10px 0;
+            padding-left: 20px;
+            columns: 2;
+            column-gap: 30px;
+        }
+        
+        .tech-stack li {
+            margin: 8px 0;
+            color: #cbd5e1;
+            break-inside: avoid;
+        }
+        
+        .tech-stack strong {
+            color: #60a5fa;
+        }
+        
+        .implementation-section {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        
+        .implementation-section h3 {
+            color: #a78bfa;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .performance-metrics {
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .performance-metrics h4 {
+            color: #22d3ee;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .metric-item {
+            background: rgba(15, 23, 42, 0.8);
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #22d3ee;
+        }
+        
+        .metric-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Cloud-Native Industrial Control System</h1>
+        <div class="subtitle">O-PAS Conformant Software-Defined PLC Platform</div>
+        <div class="project-info">
+            <strong>Student:</strong> David Gordy Ajwang Kajwang (20820550) | 
+            <strong>Supervisor:</strong> Siavash Khaksar | 
+            <strong>Program:</strong> Master of Professional Engineering: Embedded Systems
+        </div>
+    </div>
+    
+    <div class="implementation-section">
+        <h3>Technical Implementation Overview</h3>
+        <p class="description">
+            This project implements a containerized, standards-compliant industrial control platform that bridges legacy IEC 61131-3 
+            programming with modern cloud-native architectures. The system leverages Rust's memory safety for deterministic execution, 
+            Django's rapid development capabilities for the engineering interface, and open62541's proven OPC UA implementation for 
+            industrial connectivity.
+        </p>
+    </div>
+    
+    <div class="diagram-container">
+        <h2>1. System Architecture Overview</h2>
+        <p class="description">Complete system topology showing the integration of Django web services, Rust runtime components, and OPC UA connectivity within a Kubernetes-orchestrated environment.</p>
+        <div class="mermaid">
+            graph TB
+                subgraph "Cloud Engineering Layer"
+                    DW[Django 4.2 Web Application<br/>+ React Frontend<br/>+ Monaco Editor]
+                    PG[(PostgreSQL 15<br/>Configuration Store)]
+                    TS[(TimescaleDB 2.12<br/>Historical Data)]
+                    GIT[GitLab Server<br/>Version Control<br/>+ CI/CD Pipelines]
+                    REDIS[Redis 7.2<br/>Cache + Sessions]
+                end
+                
+                subgraph "Edge Computing Platform"
+                    K8S[Kubernetes 1.28<br/>Container Orchestration]
+                    RC[Rust Compiler Service<br/>pest + nom parsers<br/>LLVM backend]
+                    RT[Rust Runtime Container<br/>tokio + mio async<br/>IEC 61131-3 VM]
+                    OPC[open62541 OPC UA Server<br/>O-PAS Part 6 Compliant<br/>X.509 Security]
+                end
+                
+                subgraph "Field Device Network"
+                    DCN1[DCN-IO Node 1<br/>Raspberry Pi 4<br/>+ Industrial I/O HAT]
+                    DCN2[DCN-IO Node 2<br/>BeagleBone AI-64<br/>+ EtherCAT Master]
+                    DCN3[DCN-IO Node N<br/>Custom ARM Cortex-A<br/>+ CAN/Modbus Gateway]
+                    IO[Field I/O Systems<br/>24VDC Digital<br/>4-20mA Analog<br/>HART Protocol]
+                end
+                
+                DW -->|PLCopen XML<br/>via REST API| RC
+                RC -->|Compiled Bytecode<br/>via gRPC| RT
+                RT -->|OPC UA Variables<br/>ua-tcp| OPC
+                OPC -->|OPC UA Client-Server<br/>+ Pub-Sub UDP| DCN1
+                OPC -->|Secure Channels<br/>TLS 1.3| DCN2
+                OPC -->|Time-Sync IEEE 1588<br/>+ Event Notifications| DCN3
+                DCN1 --> IO
+                DCN2 --> IO
+                DCN3 --> IO
+                DW --> PG
+                DW --> REDIS
+                OPC --> TS
+                DW --> GIT
+                K8S -.->|Orchestrates| RC
+                K8S -.->|Orchestrates| RT
+                K8S -.->|Orchestrates| OPC
+                
+                style DW fill:#3b82f6,stroke:#60a5fa,color:#fff
+                style RC fill:#ce422b,stroke:#ef4444,color:#fff
+                style RT fill:#f97316,stroke:#fb923c,color:#fff
+                style OPC fill:#06b6d4,stroke:#22d3ee,color:#fff
+        </div>
+    </div>
+    
+    <div class="tech-stack">
+        <h3>Core Technology Stack</h3>
+        <ul>
+            <li><strong>Django 4.2 LTS</strong> - Web framework with 5-year support lifecycle</li>
+            <li><strong>PostgreSQL 15</strong> - Primary database with JSONB support</li>
+            <li><strong>TimescaleDB 2.12</strong> - Time-series extension for historical data</li>
+            <li><strong>Redis 7.2</strong> - In-memory cache and session store</li>
+            <li><strong>React 18</strong> - Frontend UI framework with concurrent features</li>
+            <li><strong>Monaco Editor</strong> - VS Code editor component for IEC 61131-3</li>
+            <li><strong>Rust 1.75</strong> - Systems programming language for runtime</li>
+            <li><strong>open62541 1.3.8</strong> - Industrial-grade OPC UA implementation</li>
+            <li><strong>Kubernetes 1.28</strong> - Container orchestration platform</li>
+            <li><strong>Docker 24.0</strong> - Containerization runtime</li>
+            <li><strong>Prometheus 2.47</strong> - Metrics collection and monitoring</li>
+            <li><strong>Grafana 10.2</strong> - Visualization and alerting dashboard</li>
+        </ul>
+    </div>
+    
+    <div class="diagram-container">
+        <h2>2. Django Engineering Workstation Architecture</h2>
+        <p class="description">Detailed implementation of the web-based engineering environment using Django's MVT pattern with modern frontend technologies and real-time collaboration features.</p>
+        <div class="mermaid">
+            graph LR
+                subgraph "Frontend Components"
+                    REACT[React 18 Components<br/>+ TypeScript 5.2<br/>+ Vite Build System]
+                    MONACO[Monaco Editor<br/>Language Server Protocol<br/>IEC 61131-3 Syntax]
+                    CANVAS[HTML5 Canvas<br/>Ladder Logic Designer<br/>Function Block Editor]
+                    WS[WebSocket Client<br/>Real-time Collaboration<br/>Live Status Updates]
+                end
+                
+                subgraph "Django Backend Services"
+                    REST[Django REST Framework 3.14<br/>+ OpenAPI Schema<br/>+ JWT Authentication]
+                    GRAPHQL[Graphene-Django 3.1<br/>Subscription Support<br/>Real-time Queries]
+                    CHANNELS[Django Channels 4.0<br/>ASGI + WebSocket<br/>Channel Layers]
+                    CELERY[Celery 5.3<br/>Background Tasks<br/>Redis Broker]
+                    AUTH[Django OAuth Toolkit 2.3<br/>OAuth 2.0 Provider<br/>RBAC Implementation]
+                end
+                
+                subgraph "Data & Storage Layer"
+                    ORM[Django ORM<br/>+ Migrations<br/>+ Connection Pooling]
+                    CACHE[Redis Cluster<br/>Session Storage<br/>Cache Framework]
+                    FILES[MinIO S3 Storage<br/>PLCopen XML Files<br/>Binary Artifacts]
+                    SEARCH[Elasticsearch 8.11<br/>Full-text Search<br/>Project Indexing]
+                end
+                
+                REACT --> REST
+                MONACO --> GRAPHQL
+                CANVAS --> CHANNELS
+                WS --> CHANNELS
+                REST --> AUTH
+                GRAPHQL --> ORM
+                CHANNELS --> CACHE
+                CELERY --> CACHE
+                AUTH --> ORM
+                ORM --> PG
+                ORM --> FILES
+                ORM --> SEARCH
+                
+                style REACT fill:#61dafb,stroke:#88e4f9,color:#000
+                style REST fill:#092e20,stroke:#0c4b33,color:#fff
+                style ORM fill:#336791,stroke:#4e8dd8,color:#fff
+        </div>
+    </div>
+    
+    <div class="implementation-section">
+        <h3>Django Implementation Details</h3>
+        <p class="description">
+            The Django application implements a complete engineering workstation following industry best practices for industrial software development:
+        </p>
+        <ul class="description">
+            <li><strong>PLCopen XML Parser:</strong> Custom Django model serializers handle IEC 61131-3 program structures</li>
+            <li><strong>Real-time Collaboration:</strong> Django Channels enables multiple engineers to edit programs simultaneously</li>
+            <li><strong>Version Control Integration:</strong> GitPython library provides seamless Git operations within Django views</li>
+            <li><strong>Security Framework:</strong> OAuth 2.0 with role-based access control following IEC 62443 guidelines</li>
+            <li><strong>Project Management:</strong> Django admin interface customized for industrial project workflows</li>
+        </ul>
+    </div>
+    
+    <div class="diagram-container">
+        <h2>3. Rust Compiler and Runtime Implementation</h2>
+        <p class="description">High-performance Rust implementation providing deterministic execution of IEC 61131-3 programs with bounded latency and memory safety guarantees.</p>
+        <div class="mermaid">
+            graph TD
+                subgraph "Compilation Pipeline"
+                    LEX[Lexical Analysis<br/>pest 2.7 Parser<br/>IEC 61131-3 Grammar]
+                    PARSE[Syntax Parsing<br/>nom 7.1 Combinators<br/>AST Generation]
+                    SEM[Semantic Analysis<br/>Type Checking<br/>Variable Resolution]
+                    OPT[LLVM Optimization<br/>llvm-sys 150<br/>Target-specific IR]
+                    GEN[Bytecode Generation<br/>bincode Serialization<br/>Compact Format]
+                end
+                
+                subgraph "Runtime Virtual Machine"
+                    LOAD[Program Loader<br/>Memory Mapping<br/>Security Validation]
+                    VM[Execution Engine<br/>Stack-based VM<br/>Cycle Scheduling]
+                    MEM[Memory Manager<br/>bumpalo 3.14<br/>Deterministic GC]
+                    TASK[Task Scheduler<br/>tokio 1.35 Runtime<br/>Real-time Priorities]
+                end
+                
+                subgraph "I/O Subsystem"
+                    HAL[Hardware Abstraction<br/>embedded-hal 1.0<br/>GPIO/SPI/I2C]
+                    MODBUS[Modbus RTU/TCP<br/>tokio-modbus 0.12<br/>Industrial Protocols]
+                    ETHERCAT[EtherCAT Master<br/>Native Implementation<br/>Distributed Clocks]
+                end
+                
+                LEX --> PARSE
+                PARSE --> SEM
+                SEM --> OPT
+                OPT --> GEN
+                GEN --> LOAD
+                LOAD --> VM
+                VM --> MEM
+                VM --> TASK
+                TASK --> HAL
+                TASK --> MODBUS
+                TASK --> ETHERCAT
+                
+                style LEX fill:#ce422b,stroke:#ef4444,color:#fff
+                style VM fill:#f97316,stroke:#fb923c,color:#fff
+                style HAL fill:#10b981,stroke:#34d399,color:#fff
+        </div>
+    </div>
+    
+    <div class="implementation-section">
+        <h3>Rust Runtime Specifications</h3>
+        <p class="description">
+            The Rust runtime implements a complete IEC 61131-3 virtual machine optimized for industrial control applications:
+        </p>
+        <div class="performance-metrics">
+            <h4>Performance Targets</h4>
+            <div class="metric-grid">
+                <div class="metric-item">
+                    <div class="metric-value">&lt; 100μs</div>
+                    <div class="metric-label">Scan Cycle Jitter</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">&lt; 1ms</div>
+                    <div class="metric-label">Worst-case Latency</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">&lt; 16MB</div>
+                    <div class="metric-label">Memory Footprint</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">1000Hz</div>
+                    <div class="metric-label">Maximum Scan Rate</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tech-stack">
+        <h3>Rust Implementation Libraries</h3>
+        <ul>
+            <li><strong>pest 2.7</strong> - PEG parser generator for IEC 61131-3 grammar</li>
+            <li><strong>nom 7.1</strong> - Parser combinators for flexible syntax handling</li>
+            <li><strong>llvm-sys 150</strong> - LLVM bindings for code optimization</li>
+            <li><strong>tokio 1.35</strong> - Async runtime with real-time scheduler</li>
+            <li><strong>mio 0.8</strong> - Low-level I/O with epoll/kqueue support</li>
+            <li><strong>bumpalo 3.14</strong> - Bump allocator for deterministic memory</li>
+            <li><strong>embedded-hal 1.0</strong> - Hardware abstraction layer</li>
+            <li><strong>serde 1.0</strong> - Serialization framework</li>
+            <li><strong>bincode 1.3</strong> - Binary encoding for efficient bytecode</li>
+            <li><strong>crossbeam 0.8</strong> - Lock-free data structures</li>
+            <li><strong>tracing 0.1</strong> - Structured logging and diagnostics</li>
+            <li><strong>criterion 0.5</strong> - Benchmarking framework</li>
+        </ul>
+    </div>
+    
+    <div class="diagram-container">
+        <h2>4. OPC UA Communication Architecture</h2>
+        <p class="description">Industrial-grade communication infrastructure using open62541 with O-PAS Part 6 compliance for interoperable, secure, and deterministic data exchange.</p>
+        <div class="mermaid">
+            graph TB
+                subgraph "OPC UA Server Core"
+                    CORE[open62541 1.3.8<br/>Multi-threaded Server<br/>Event Loop Architecture]
+                    SEC[Security Framework<br/>mbedTLS 3.5<br/>X.509 PKI Infrastructure]
+                    SUB[Subscription Engine<br/>Data Change Detection<br/>Event Notification System]
+                    HIST[Historical Access<br/>TimescaleDB Integration<br/>HA Profile Compliance]
+                end
+                
+                subgraph "Information Models"
+                    OPAS[O-PAS Part 6 Model<br/>Distributed Control Nodes<br/>ISA-88/95 Integration]
+                    DEVICE[Device Integration<br/>AutomationML Import<br/>OPC UA Companion Specs]
+                    CUSTOM[Project-specific Models<br/>Custom ObjectTypes<br/>Method Implementations]
+                end
+                
+                subgraph "Transport & Encoding"
+                    BINARY[UA Binary Protocol<br/>TCP/IP Transport<br/>Chunk-based Messaging]
+                    JSON[UA JSON Encoding<br/>WebSocket Transport<br/>Cloud Gateway Support]
+                    PUBSUB[Pub-Sub Protocol<br/>UDP Multicast<br/>MQTT 5.0 Bridge]
+                    TSN[Time-Sensitive Networking<br/>IEEE 802.1Qbv<br/>Deterministic Ethernet]
+                end
+                
+                CORE --> SEC
+                CORE --> SUB
+                CORE --> HIST
+                CORE --> OPAS
+                OPAS --> DEVICE
+                OPAS --> CUSTOM
+                SUB --> BINARY
+                SUB --> JSON
+                SUB --> PUBSUB
+                PUBSUB --> TSN
+                
+                style CORE fill:#06b6d4,stroke:#22d3ee,color:#fff
+                style OPAS fill:#10b981,stroke:#34d399,color:#fff
+                style TSN fill:#f59e0b,stroke:#fbbf24,color:#fff
+        </div>
+    </div>
+    
+    <div class="implementation-section">
+        <h3>OPC UA Implementation Features</h3>
+        <p class="description">
+            The open62541 implementation provides comprehensive OPC UA functionality with industrial-grade performance and security:
+        </p>
+        <ul class="description">
+            <li><strong>O-PAS Compliance:</strong> Full implementation of O-PAS Part 6 information model with DCN support</li>
+            <li><strong>Security Features:</strong> IEC 62443-3-3 compliant security with X.509 certificate management</li>
+            <li><strong>Real-time Capabilities:</strong> Deterministic Pub-Sub with TSN support for time-critical applications</li>
+            <li><strong>Scalability:</strong> Multi-client support with efficient subscription management and data optimization</li>
+            <li><strong>Interoperability:</strong> Certified OPC UA compatibility with major industrial automation vendors</li>
+        </ul>
+    </div>
+    
+    <div class="diagram-container">
+        <h2>5. Container Orchestration and DevOps Pipeline</h2>
+        <p class="description">Cloud-native deployment using Kubernetes with GitOps workflows, automated testing, and continuous integration for industrial software lifecycle management.</p>
+        <div class="mermaid">
+            graph LR
+                subgraph "Development Pipeline"
+                    GIT2[GitLab CE 16.5<br/>Source Control<br/>Issue Tracking]
+                    CI[GitLab CI/CD<br/>Automated Testing<br/>Security Scanning]
+                    REG[Harbor Registry<br/>Container Images<br/>Vulnerability Scanning]
+                    HELM2[Helm 3.13<br/>Package Management<br/>Release Automation]
+                end
+                
+                subgraph "Runtime Containers"
+                    WEB[Django Container<br/>gunicorn + nginx<br/>Alpine Linux Base]
+                    COMP2[Rust Compiler<br/>Multi-stage Build<br/>Distroless Image]
+                    RT2[Runtime Container<br/>Minimal Footprint<br/>Real-time Kernel]
+                    OPC3[OPC UA Container<br/>Security Hardened<br/>Non-root Execution]
+                end
+                
+                subgraph "Kubernetes Platform"
+                    K8S2[K8s Control Plane<br/>etcd Cluster<br/>API Server HA]
+                    ISTIO[Istio Service Mesh<br/>mTLS Encryption<br/>Traffic Management]
+                    PROM[Prometheus Stack<br/>Metrics Collection<br/>Alert Manager]
+                    GRAF[Grafana Enterprise<br/>Industrial Dashboards<br/>Alarm Management]
+                end
+                
+                GIT2 --> CI
+                CI --> REG
+                REG --> HELM2
+                HELM2 --> WEB
+                HELM2 --> COMP2
+                HELM2 --> RT2
+                HELM2 --> OPC3
+                WEB --> K8S2
+                COMP2 --> K8S2
+                RT2 --> K8S2
+                OPC3 --> K8S2
+                K8S2 --> ISTIO
+                K8S2 --> PROM
+                PROM --> GRAF
+                
+                style GIT2 fill:#fc6d26,stroke:#fca326,color:#fff
+                style K8S2 fill:#326ce5,stroke:#4e7cef,color:#fff
+                style ISTIO fill:#466bb0,stroke:#5b7bc7,color:#fff
+        </div>
+    </div>
+    
+    <div class="tech-stack">
+        <h3>DevOps and Orchestration Technologies</h3>
+        <ul>
+            <li><strong>Kubernetes 1.28</strong> - Container orchestration with real-time node scheduling</li>
+            <li><strong>Istio 1.20</strong> - Service mesh with zero-trust security model</li>
+            <li><strong>Helm 3.13</strong> - Package manager with rollback capabilities</li>
+            <li><strong>GitLab CE 16.5</strong> - Integrated DevOps platform with CI/CD</li>
+            <li><strong>Harbor 2.9</strong> - Enterprise container registry with security scanning</li>
+            <li><strong>Prometheus 2.47</strong> - Time-series metrics with industrial alerting</li>
+            <li><strong>Grafana Enterprise</strong> - Industrial-grade visualization and dashboards</li>
+            <li><strong>Fluentd 1.16</strong> - Log aggregation with industrial data formats</li>
+            <li><strong>Jaeger 1.51</strong> - Distributed tracing for debugging complex workflows</li>
+            <li><strong>ArgoCD 2.8</strong> - GitOps continuous deployment</li>
+            <li><strong>Vault 1.15</strong> - Secrets management with PKI integration</li>
+            <li><strong>Falco 0.36</strong> - Runtime security monitoring</li>
+        </ul>
+    </div>
+    
+    <div class="diagram-container">
+        <h2>6. Data Flow and Integration Sequence</h2>
+        <p class="description">Complete engineering-to-deployment workflow showing all integration points, data transformations, and security checkpoints in the software-defined PLC lifecycle.</p>
+        <div class="mermaid">
+            sequenceDiagram
+                participant Eng as Control Engineer
+                participant Web as Django Web App
+                participant Git as GitLab Server
+                participant CI as CI/CD Pipeline
+                participant Comp as Rust Compiler
+                participant K8s as Kubernetes
+                participant Run as Runtime Container
+                participant OPC as OPC UA Server
+                participant DCN as DCN-IO Node
+                participant IO as Field I/O
+                
+                Eng->>Web: Create/Edit IEC 61131-3 Program
+                Web->>Web: Validate PLCopen XML Syntax
+                Web->>Git: Commit Program Changes
+                Git->>CI: Trigger Build Pipeline
+                CI->>CI: Run Safety & Security Tests
+                CI->>Comp: Compile to Bytecode
+                Comp->>Comp: LLVM Optimization Pass
+                Comp->>CI: Return Validated Bytecode
+                CI->>K8s: Deploy via Helm Chart
+                K8s->>Run: Start Runtime Container
+                Run->>Run: Load & Verify Bytecode
+                Run->>OPC: Register Variables & Methods
+                OPC->>DCN: Download Control Program
+                DCN->>DCN: Execute Scan Cycle
+                DCN->>IO: Read Sensors & Actuators
+                IO->>DCN: Return Process Values
+                DCN->>OPC: Report Status & Data
+                OPC->>Web: Update Real-time Dashboard
+                Web->>Eng: Display Process Metrics
+                
+                Note over CI,Comp: Automated testing includes:<br/>Static analysis, unit tests,<br/>hardware-in-the-loop validation
+                Note over Run,DCN: Secure deployment with:<br/>X.509 authentication,<br/>encrypted channels,<br/>code signing verification
+        </div>
+    </div>
+    
+    <div class="diagram-container">
+        <h2>7. Security Implementation Architecture</h2>
+        <p class="description">Multi-layered security framework implementing IEC 62443-3-3 standards with defense-in-depth principles for industrial cybersecurity.</p>
+        <div class="mermaid">
+            graph TD
+                subgraph "Identity & Access Management"
+                    LDAP[Active Directory<br/>LDAP Integration<br/>Corporate Identity]
+                    OAUTH[OAuth 2.0 Provider<br/>OIDC Support<br/>JWT Tokens]
+                    RBAC2[Fine-grained RBAC<br/>Industrial Roles<br/>Least Privilege]
+                    MFA[Multi-factor Auth<br/>TOTP + Hardware<br/>Security Keys]
+                end
+                
+                subgraph "Network Security"
+                    FW[Industrial Firewall<br/>Deep Packet Inspection<br/>Protocol Whitelisting]
+                    VPN[WireGuard VPN<br/>Site-to-site Tunnels<br/>Zero-trust Access]
+                    TLS2[TLS 1.3 Everywhere<br/>Perfect Forward Secrecy<br/>Certificate Pinning]
+                    IDS[Network IDS/IPS<br/>Industrial Protocol<br/>Anomaly Detection]
+                end
+                
+                subgraph "Application Security"
+                    SIGN2[Code Signing<br/>PKI Infrastructure<br/>Integrity Verification]
+                    VAULT2[HashiCorp Vault<br/>Secrets Management<br/>Dynamic Credentials]
+                    SCAN2[Vulnerability Scanning<br/>SAST + DAST<br/>Container Security]
+                    AUDIT[Security Auditing<br/>SIEM Integration<br/>Compliance Reporting]
+                end
+                
+                subgraph "Runtime Protection"
+                    SELINUX[SELinux Policies<br/>Mandatory Access<br/>Container Isolation]
+                    FALCO2[Falco Runtime<br/>Anomaly Detection<br/>Behavioral Analysis]
+                    GVISOR[gVisor Sandboxing<br/>User-space Kernel<br/>Attack Surface Reduction]
+                    SECCOMP[Seccomp Filters<br/>System Call Filtering<br/>Privilege Escalation Prevention]
+                end
+                
+                LDAP --> OAUTH
+                OAUTH --> RBAC2
+                RBAC2 --> MFA
+                MFA --> FW
+                FW --> VPN
+                VPN --> TLS2
+                TLS2 --> IDS
+                IDS --> SIGN2
+                SIGN2 --> VAULT2
+                VAULT2 --> SCAN2
+                SCAN2 --> AUDIT
+                AUDIT --> SELINUX
+                SELINUX --> FALCO2
+                FALCO2 --> GVISOR
+                GVISOR --> SECCOMP
+                
+                style OAUTH fill:#dc2626,stroke:#ef4444,color:#fff
+                style TLS2 fill:#16a34a,stroke:#22c55e,color:#fff
+                style VAULT2 fill:#7c3aed,stroke:#8b5cf6,color:#fff
+                style FALCO2 fill:#ea580c,stroke:#f97316,color:#fff
+        </div>
+    </div>
+    
+    <div class="implementation-section">
+        <h3>Security Implementation Standards</h3>
+        <p class="description">
+            The security architecture implements comprehensive protection following international standards:
+        </p>
+        <ul class="description">
+            <li><strong>IEC 62443-3-3:</strong> System security requirements with Security Level 2 (SL-2) compliance</li>
+            <li><strong>IEC 62443-4-2:</strong> Technical security requirements for industrial automation components</li>
+            <li><strong>NIST Cybersecurity Framework:</strong> Identify, Protect, Detect, Respond, Recover methodology</li>
+            <li><strong>ISO 27001:</strong> Information security management system with industrial adaptations</li>
+            <li><strong>Common Criteria EAL4:</strong> Security evaluation for critical control system components</li>
+        </ul>
+    </div>
+    
+    <div class="tech-stack">
+        <h3>Security Technology Stack</h3>
+        <ul>
+            <li><strong>HashiCorp Vault 1.15</strong> - Enterprise secrets management with PKI</li>
+            <li><strong>OAuth 2.0 + OIDC</strong> - Industry-standard authentication protocols</li>
+            <li><strong>X.509 PKI</strong> - Certificate-based authentication and code signing</li>
+            <li><strong>WireGuard VPN</strong> - Modern, high-performance VPN protocol</li>
+            <li><strong>TLS 1.3</strong> - Latest transport layer security standard</li>
+            <li><strong>SELinux</strong> - Mandatory access control for Linux containers</li>
+            <li><strong>gVisor</strong> - Application kernel for container sandboxing</li>
+            <li><strong>Falco 0.36</strong> - Runtime security monitoring for Kubernetes</li>
+            <li><strong>Trivy</strong> - Comprehensive vulnerability scanner</li>
+            <li><strong>OPA Gatekeeper</strong> - Policy engine for Kubernetes admission control</li>
+            <li><strong>Istio Security</strong> - Service mesh security with mutual TLS</li>
+            <li><strong>SIEM Integration</strong> - Splunk/ELK stack for security analytics</li>
+        </ul>
+    </div>
+    
+    <div class="diagram-container">
+        <h2>8. Performance Optimization and Real-time Guarantees</h2>
+        <p class="description">System-wide optimization strategy ensuring deterministic performance for industrial control applications with hard real-time requirements.</p>
+        <div class="mermaid">
+            graph TB
+                subgraph "Real-time Linux Kernel"
+                    RT_KERNEL[PREEMPT_RT Kernel<br/>Deterministic Scheduling<br/>Priority Inheritance]
+                    ISOLCPUS[CPU Isolation<br/>Dedicated Control Cores<br/>IRQ Affinity]
+                    HUGEPAGES[Huge Pages<br/>Reduced TLB Misses<br/>Memory Predictability]
+                end
+                
+                subgraph "Container Optimization"
+                    CPU_PINNING[CPU Pinning<br/>NUMA Awareness<br/>Cache Optimization]
+                    MEM_LOCK[Memory Locking<br/>mlockall() System Call<br/>Swap Prevention]
+                    CGROUP[Control Groups v2<br/>Resource Isolation<br/>QoS Management]
+                end
+                
+                subgraph "Network Performance"
+                    DPDK[DPDK Integration<br/>Kernel Bypass<br/>User-space Networking]
+                    SR_IOV[SR-IOV Support<br/>Hardware Virtualization<br/>Direct Device Access]
+                    TSN2[TSN Configuration<br/>Traffic Shaping<br/>Time Synchronization]
+                end
+                
+                subgraph "Application Tuning"
+                    RUST_OPT[Rust Optimizations<br/>Zero-cost Abstractions<br/>SIMD Instructions]
+                    JIT[Just-in-time Compilation<br/>Runtime Optimization<br/>Hot Path Detection]
+                    PREFETCH[Data Prefetching<br/>Cache Line Optimization<br/>Memory Access Patterns]
+                end
+                
+                RT_KERNEL --> ISOLCPUS
+                ISOLCPUS --> HUGEPAGES
+                HUGEPAGES --> CPU_PINNING
+                CPU_PINNING --> MEM_LOCK
+                MEM_LOCK --> CGROUP
+                CGROUP --> DPDK
+                DPDK --> SR_IOV
+                SR_IOV --> TSN2
+                TSN2 --> RUST_OPT
+                RUST_OPT --> JIT
+                JIT --> PREFETCH
+                
+                style RT_KERNEL fill:#ef4444,stroke:#f87171,color:#fff
+                style DPDK fill:#3b82f6,stroke:#60a5fa,color:#fff
+                style RUST_OPT fill:#f59e0b,stroke:#fbbf24,color:#fff
+        </div>
+    </div>
+    
+    <div class="performance-metrics">
+        <h4>Real-time Performance Specifications</h4>
+        <div class="metric-grid">
+            <div class="metric-item">
+                <div class="metric-value">50μs</div>
+                <div class="metric-label">Average Scan Jitter</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value">500μs</div>
+                <div class="metric-label">Maximum Latency</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value">10kHz</div>
+                <div class="metric-label">Control Loop Rate</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value">99.99%</div>
+                <div class="metric-label">Timing Predictability</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value">1μs</div>
+                <div class="metric-label">Time Sync Accuracy</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value">8MB</div>
+                <div class="metric-label">Runtime Memory</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="diagram-container">
+        <h2>9. Mining Conveyor Control Case Study Implementation</h2>
+        <p class="description">Hardware-in-the-loop validation scenario demonstrating the complete system capabilities in a realistic industrial application with safety-critical requirements.</p>
+        <div class="mermaid">
+            graph LR
+                subgraph "Process Control Logic"
+                    SAFETY[Safety Interlocks<br/>Emergency Stops<br/>SIL 2 Compliance]
+                    MOTOR[Motor Control<br/>VFD Integration<br/>Torque Monitoring]
+                    BELT[Belt Monitoring<br/>Speed Feedback<br/>Slip Detection]
+                    LOAD[Load Management<br/>Weight Sensors<br/>Capacity Control]
+                end
+                
+                subgraph "Field Instrumentation"
+                    PROX[Proximity Sensors<br/>24VDC Digital I/O<br/>Safety Rated]
+                    ANALOG[Analog Inputs<br/>4-20mA Current Loop<br/>HART Protocol]
+                    VFD[Variable Frequency Drive<br/>Modbus RTU<br/>485 Network]
+                    HMI[Local HMI Panel<br/>Ethernet/IP<br/>Alarm Display]
+                end
+                
+                subgraph "Communication Networks"
+                    ETHERNET[Industrial Ethernet<br/>Managed Switches<br/>Redundant Rings]
+                    WIRELESS[Industrial WiFi<br/>802.11ac<br/>Mesh Topology]
+                    CELLULAR[4G/5G Gateway<br/>Remote Access<br/>Cloud Connectivity]
+                end
+                
+                subgraph "Edge Computing Nodes"
+                    EDGE1[Conveyor Head DCN<br/>Raspberry Pi 4<br/>Real-time Control]
+                    EDGE2[Transfer Point DCN<br/>BeagleBone AI<br/>Vision Processing]
+                    EDGE3[Tail Pulley DCN<br/>Industrial PC<br/>Safety System]
+                end
+                
+                SAFETY --> PROX
+                MOTOR --> VFD
+                BELT --> ANALOG
+                LOAD --> ANALOG
+                PROX --> ETHERNET
+                VFD --> ETHERNET
+                HMI --> ETHERNET
+                ETHERNET --> EDGE1
+                ETHERNET --> EDGE2
+                WIRELESS --> EDGE3
+                EDGE1 --> CELLULAR
+                
+                style SAFETY fill:#dc2626,stroke:#ef4444,color:#fff
+                style EDGE1 fill:#10b981,stroke:#34d399,color:#fff
+                style CELLULAR fill:#8b5cf6,stroke:#a78bfa,color:#fff
+        </div>
+    </div>
+    
+    <div class="implementation-section">
+        <h3>Validation Methodology</h3>
+        <p class="description">
+            The mining conveyor case study provides comprehensive validation of the system across multiple dimensions:
+        </p>
+        <ul class="description">
+            <li><strong>Functional Safety:</strong> SIL 2 safety logic implementation with redundant emergency stop systems</li>
+            <li><strong>Real-time Performance:</strong> Deterministic control loops with sub-millisecond response times</li>
+            <li><strong>Network Resilience:</strong> Seamless failover between redundant communication paths</li>
+            <li><strong>Edge Computing:</strong> Distributed intelligence with local decision-making capabilities</li>
+            <li><strong>Remote Management:</strong> Secure cloud connectivity for monitoring and maintenance</li>
+            <li><strong>Standards Compliance:</strong> Full IEC 61131-3, OPC UA, and O-PAS conformance testing</li>
+        </ul>
+    </div>
+    
+    <div class="diagram-container">
+        <h2>10. Future Roadmap and IEC 61499 Integration</h2>
+        <p class="description">Evolutionary path toward event-driven architectures while maintaining backward compatibility with existing IEC 61131-3 implementations.</p>
+        <div class="mermaid">
+            graph TB
+                subgraph "Current IEC 61131-3 Implementation"
+                    CYCLIC[Cyclic Execution<br/>Fixed Scan Cycle<br/>Deterministic Timing]
+                    FB_LIB[Function Block Library<br/>Standard Blocks<br/>Custom Extensions]
+                    ST_LANG[Structured Text<br/>Pascal-like Syntax<br/>Type Safety]
+                end
+                
+                subgraph "Hybrid Execution Model"
+                    EVENT_BUS[Event Bus<br/>Publish-Subscribe<br/>Async Messaging]
+                    MIXED_EXEC[Mixed Execution<br/>Cyclic + Event-driven<br/>Priority Scheduling]
+                    STATE_MGR[State Manager<br/>Consistent State<br/>Transaction Support]
+                end
+                
+                subgraph "Future IEC 61499 Features"
+                    ECC[Execution Control Chart<br/>State-based Logic<br/>Event Transitions]
+                    DISTRIB[Distributed Execution<br/>Network Transparency<br/>Load Balancing]
+                    FB_MOBILE[Mobile Function Blocks<br/>Dynamic Deployment<br/>Runtime Migration]
+                end
+                
+                subgraph "API Compatibility Layer"
+                    ADAPTER[Legacy Adapter<br/>61131-3 Wrapper<br/>Seamless Migration]
+                    BRIDGE[Protocol Bridge<br/>Event ↔ Cyclic<br/>Data Conversion]
+                    COMPAT[Compatibility Matrix<br/>Feature Mapping<br/>Migration Tools]
+                end
+                
+                CYCLIC --> EVENT_BUS
+                FB_LIB --> MIXED_EXEC
+                ST_LANG --> STATE_MGR
+                EVENT_BUS --> ECC
+                MIXED_EXEC --> DISTRIB
+                STATE_MGR --> FB_MOBILE
+                ECC --> ADAPTER
+                DISTRIB --> BRIDGE
+                FB_MOBILE --> COMPAT
+                
+                style CYCLIC fill:#3b82f6,stroke:#60a5fa,color:#fff
+                style MIXED_EXEC fill:#f59e0b,stroke:#fbbf24,color:#fff
+                style ECC fill:#10b981,stroke:#34d399,color:#fff
+                style ADAPTER fill:#8b5cf6,stroke:#a78bfa,color:#fff
+        </div>
+    </div>
+    
+    <div class="implementation-section">
+        <h3>Research Contributions and Expected Outcomes</h3>
+        <p class="description">
+            This project delivers several key contributions to the industrial automation field:
+        </p>
+        <ul class="description">
+            <li><strong>Reference Architecture:</strong> Complete open-source implementation of software-defined PLC platform</li>
+            <li><strong>Performance Benchmarks:</strong> Quantitative comparison with proprietary hardware PLC systems</li>
+            <li><strong>Security Framework:</strong> Industrial cybersecurity implementation following IEC 62443 standards</li>
+            <li><strong>Migration Strategy:</strong> Practical pathway from legacy systems to cloud-native architectures</li>
+            <li><strong>Standards Compliance:</strong> Validated conformance to IEC 61131-3, OPC UA, and O-PAS specifications</li>
+            <li><strong>Educational Resources:</strong> Complete documentation and tutorials for academic and industrial use</li>
+        </ul>
+    </div>
+    
+    <div class="tech-stack">
+        <h3>Project Deliverables</h3>
+        <ul>
+            <li><strong>Source Code Repository:</strong> Complete system implementation with MIT/Apache 2.0 licensing</li>
+            <li><strong>Container Images:</strong> Production-ready Docker images published to public registries</li>
+            <li><strong>Helm Charts:</strong> Kubernetes deployment packages with configuration templates</li>
+            <li><strong>Documentation:</strong> Comprehensive technical documentation and user guides</li>
+            <li><strong>Test Suites:</strong> Automated testing framework with CI/CD pipeline examples</li>
+            <li><strong>Benchmarking Tools:</strong> Performance measurement and comparison utilities</li>
+            <li><strong>Compliance Reports:</strong> Standards conformance testing results and certificates</li>
+            <li><strong>Training Materials:</strong> Educational content for engineering students and professionals</li>
+            <li><strong>Reference Implementations:</strong> Example applications and use case demonstrations</li>
+            <li><strong>Migration Guides:</strong> Step-by-step procedures for legacy system modernization</li>
+            <li><strong>Security Hardening:</strong> Best practices and configuration templates for production deployment</li>
+            <li><strong>API Documentation:</strong> RESTful and GraphQL API specifications with examples</li>
+        </ul>
+    </div>
+    
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#3b82f6',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#60a5fa',
+                lineColor: '#60a5fa',
+                secondaryColor: '#8b5cf6',
+                tertiaryColor: '#06b6d4',
+                quaternaryColor: '#10b981',
+                background: '#1e293b',
+                mainBkg: '#0f172a',
+                secondBkg: '#1e293b',
+                tertiaryBkg: '#334155',
+                primaryBorderColor: '#3b82f6',
+                secondaryBorderColor: '#8b5cf6',
+                tertiaryBorderColor: '#06b6d4',
+                quaternaryBorderColor: '#10b981',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                fontSize: '13px',
+                darkMode: true,
+                flowchart: {
+                    nodeTextColor: '#fff',
+                    curveType: 'basis'
+                }
+            },
+            flowchart: {
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            sequence: {
+                actorMargin: 50,
+                width: 150,
+                height: 65,
+                boxMargin: 10,
+                boxTextMargin: 5,
+                noteMargin: 10,
+                messageMargin: 35
+            }
+        });
+    </script>
+</body>
+</html>
